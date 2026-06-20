@@ -1,5 +1,5 @@
 <!-- Top Bar -->
-<div class="sticky top-0 z-40 bg-white shadow-md">
+<div class="sticky top-0 z-40 bg-white dark:bg-slate-900 shadow-md">
     <div class="flex items-center justify-between h-16 px-6">
         <!-- Mobile Menu Button -->
         <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden text-gray-600 hover:text-gray-900">
@@ -8,13 +8,22 @@
         
         <!-- Page Title (optional) -->
         <div class="hidden lg:block">
-            <h1 class="text-lg font-semibold text-gray-800">
+            <h1 class="text-lg font-semibold text-gray-800 dark:text-white">
                 @yield('page-title', 'Dashboard')
             </h1>
         </div>
         
         <!-- Right Side -->
         <div class="flex items-center space-x-4 ml-auto">
+        <!-- Theme Toggle -->
+        <button onclick="toggleTheme(this)"
+        class="w-9 h-9 rounded-lg flex items-center justify-center bg-gray-100 hover:bg-gray-200 border transition"
+        title="Toggle Dark/Light Mode">
+
+         <i class="fas fa-moon"></i>
+
+</button>
+
             <!-- Language Switcher -->
             <div class="relative" x-data="{ open: false }">
                 <button @click="open = !open" class="flex items-center space-x-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border rounded-lg hover:bg-gray-50 transition">
@@ -36,8 +45,8 @@
             <div class="relative" x-data="{ open: false }">
                 <button @click="open = !open" class="flex items-center space-x-3 hover:bg-gray-50 rounded-lg px-3 py-2 transition">
                     <div class="text-right hidden sm:block">
-                        <p class="text-sm font-medium text-gray-900">{{ auth()->user()->name }}</p>
-                        <p class="text-xs text-gray-500">Administrator</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ auth()->user()->name }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Administrator</p>
                     </div>
                     <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white font-bold shadow">
                         <i class="fas fa-user-shield"></i>

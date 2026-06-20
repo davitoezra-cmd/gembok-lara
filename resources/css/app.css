@@ -9,3 +9,37 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* ===== DARK MODE via class ===== */
+@variant dark (&:where(.dark, .dark *));
+
+/* ===== CUSTOM THEME VARIABLES ===== */
+@layer base {
+    :root {
+        --bg-sidebar: #1a2236;
+        --bg-main: #f4f6f9;
+        --bg-card: #ffffff;
+        --bg-header: #ffffff;
+        --text-primary: #1a2236;
+        --text-secondary: #6b7a99;
+        --text-sidebar: #c8d3e8;
+        --border-color: #e4e9f2;
+    }
+
+    .dark {
+        --bg-sidebar: #0f1724;
+        --bg-main: #131c2e;
+        --bg-card: #1a2440;
+        --bg-header: #1a2440;
+        --text-primary: #e2e8f8;
+        --text-secondary: #8899bb;
+        --text-sidebar: #8899bb;
+        --border-color: #243060;
+    }
+
+    body {
+        background-color: var(--bg-main);
+        color: var(--text-primary);
+        transition: background-color 0.3s, color 0.3s;
+    }
+}

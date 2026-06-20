@@ -7,7 +7,16 @@
 @endpush
 
 @section('content')
-<div class="min-h-screen bg-gray-100" x-data="{ sidebarOpen: false }">
+<div class="min-h-screen bg-gray-100 dark:bg-slate-800 transition-colors duration-300" 
+     x-data="{
+         sidebarOpen: false,
+         isDark: localStorage.getItem('theme') === 'dark',
+         toggleTheme() {
+             this.isDark = !this.isDark;
+             localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+             document.documentElement.classList.toggle('dark', this.isDark);
+         }
+     }">
     @include('admin.partials.sidebar')
 
     <div class="lg:pl-64">
@@ -17,68 +26,67 @@
         <div class="p-6">
             <!-- Welcome Section -->
             <div class="mb-6">
-                <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-                <p class="text-gray-600 mt-1">Welcome back, {{ auth()->user()->name }}!</p>
-            </div>
-
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+              <p class="text-gray-600 dark:text-gray-400 mt-1">Welcome back, {{ auth()->user()->name }}!</p>
+           </div>
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <!-- Total Customers -->
-                <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition">
+                <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600 mb-1">Total Customers</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ $stats['total_customers'] }}</p>
-                            <p class="text-xs text-green-600 mt-1">
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-1">Total Customers</p>
+                            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $stats['total_customers'] }}</p>
+                            <p class="text-xs text-green-600 dark:text-green-400 mt-1">
                                 <i class="fas fa-check-circle"></i> {{ $stats['active_customers'] }} active
                             </p>
                         </div>
-                        <div class="h-14 w-14 bg-blue-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-users text-blue-600 text-2xl"></i>
+                        <div class="h-14 w-14 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center">
+                            <i class="fas fa-users text-blue-600 dark:text-blue-400 text-2xl"></i>
                         </div>
                     </div>
                 </div>
-
                 <!-- Total Revenue -->
-                <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition">
+                <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600 mb-1">Total Revenue</p>
-                            <p class="text-2xl font-bold text-gray-900">Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}</p>
-                            <p class="text-xs text-gray-500 mt-1">Paid invoices</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-1">Total Revenue</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Paid invoices</p>
                         </div>
-                        <div class="h-14 w-14 bg-green-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-money-bill-wave text-green-600 text-2xl"></i>
+                        <div class="h-14 w-14 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center">
+                            <i class="fas fa-money-bill-wave text-green-600 dark:text-green-400 text-2xl"></i>
                         </div>
                     </div>
                 </div>
 
                 <!-- Pending Revenue -->
-                <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500 hover:shadow-lg transition">
+                <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6 border-l-4 border-yellow-500 hover:shadow-lg transition">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600 mb-1">Pending Revenue</p>
-                            <p class="text-2xl font-bold text-gray-900">Rp {{ number_format($stats['pending_revenue'], 0, ',', '.') }}</p>
-                            <p class="text-xs text-yellow-600 mt-1">
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-1">Pending Revenue</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">Rp {{ number_format($stats['pending_revenue'], 0, ',', '.') }}</p>
+                            <p class="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
                                 <i class="fas fa-clock"></i> {{ $stats['unpaid_invoices'] }} unpaid
                             </p>
                         </div>
-                        <div class="h-14 w-14 bg-yellow-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-hourglass-half text-yellow-600 text-2xl"></i>
+                        <div class="h-14 w-14 bg-yellow-100 dark:bg-yellow-900/50 rounded-full flex items-center justify-center">
+                            <i class="fas fa-hourglass-half text-yellow-600 dark:text-yellow-400 text-2xl"></i>
                         </div>
                     </div>
                 </div>
 
+
                 <!-- Total Packages -->
-                <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-cyan-500 hover:shadow-lg transition">
+                <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6 border-l-4 border-cyan-500 hover:shadow-lg transition">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600 mb-1">Total Packages</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ $stats['total_packages'] }}</p>
-                            <p class="text-xs text-gray-500 mt-1">Active packages</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-1">Total Packages</p>
+                            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $stats['total_packages'] }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Active packages</p>
                         </div>
-                        <div class="h-14 w-14 bg-cyan-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-box text-cyan-600 text-2xl"></i>
+                        <div class="h-14 w-14 bg-cyan-100 dark:bg-cyan-900/50 rounded-full flex items-center justify-center">
+                            <i class="fas fa-box text-cyan-600 dark:text-cyan-400 text-2xl"></i>
                         </div>
                     </div>
                 </div>
@@ -87,8 +95,8 @@
             <!-- Charts Section -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <!-- Revenue Chart -->
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
                         <i class="fas fa-chart-line mr-2 text-cyan-600"></i>
                         Revenue Trend (Last 6 Months)
                     </h3>
@@ -97,9 +105,10 @@
                     </div>
                 </div>
 
+
                 <!-- Customer Growth Chart -->
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
                         <i class="fas fa-user-plus mr-2 text-blue-600"></i>
                         New Customers (Last 6 Months)
                     </h3>
@@ -110,10 +119,10 @@
             </div>
 
             <!-- Package Distribution & Invoice Status -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <!-- Package Distribution -->
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
                         <i class="fas fa-chart-pie mr-2 text-cyan-600"></i>
                         Package Distribution
                     </h3>
@@ -123,8 +132,8 @@
                 </div>
 
                 <!-- Invoice Status -->
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                 <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
                         <i class="fas fa-file-invoice mr-2 text-blue-600"></i>
                         Invoice Status
                     </h3>
@@ -134,12 +143,13 @@
                 </div>
             </div>
 
+
             <!-- Recent Activity -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Recent Invoices -->
-                <div class="bg-white rounded-xl shadow-md p-6">
+                 <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">
                             <i class="fas fa-file-invoice mr-2 text-blue-600"></i>
                             Recent Invoices
                         </h3>
@@ -168,9 +178,9 @@
                 </div>
 
                 <!-- Recent Customers -->
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">
+                <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6">
+                   <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">
                             <i class="fas fa-user-plus mr-2 text-green-600"></i>
                             Recent Customers
                         </h3>

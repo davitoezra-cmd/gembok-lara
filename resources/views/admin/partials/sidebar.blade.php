@@ -23,10 +23,23 @@
             <span>Dashboard</span>
         </a>
         
-        <a href="{{ route('admin.customers.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.customers.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-users w-5 mr-3"></i>
-            <span>Customers</span>
-        </a>
+        <div x-data="{ openCustomers: {{ request()->routeIs('admin.customers.*') ? 'true' : 'false' }} }">
+    
+    <button @click="openCustomers = !openCustomers" 
+        class="flex items-center w-full px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.customers.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+        <i class="fas fa-users w-5 mr-3"></i>
+        <span>Customers</span>
+        <i class="fas fa-chevron-down ml-auto text-xs transition-transform duration-200" :class="openCustomers ? 'rotate-180' : ''"></i>
+    </button>
+    
+    <div x-show="openCustomers" x-cloak class="mt-1 ml-4 pl-4 border-l border-cyan-500/30 space-y-1">
+        <a href="{{ route('admin.customers.index') }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">All Customers</a>
+        <a href="{{ route('admin.customers.index', ['status' => 'active']) }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">Active</a>
+        <a href="{{ route('admin.customers.index', ['status' => 'inactive']) }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">Inactive</a>
+        <a href="{{ route('admin.customers.index', ['status' => 'suspended']) }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">Suspended</a>
+    </div>
+
+</div>
         
         <a href="{{ route('admin.packages.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.packages.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
             <i class="fas fa-box w-5 mr-3"></i>

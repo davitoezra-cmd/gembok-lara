@@ -3,23 +3,26 @@
 @section('title', 'Technician Details')
 
 @section('content')
-<div class="min-h-screen bg-gray-100" x-data="{ sidebarOpen: false }">
+<div class="min-h-screen bg-gray-100 dark:bg-slate-800 transition-colors duration-300" 
+     x-data="{ 
+         sidebarOpen: false, 
+         isDark: localStorage.getItem('theme') === 'dark' 
+     }">
     @include('admin.partials.sidebar')
 
     <div class="lg:pl-64">
         @include('admin.partials.topbar')
 
         <div class="p-6">
-            <!-- Header -->
             <div class="mb-6">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
-                        <a href="{{ route('admin.technicians.index') }}" class="text-gray-600 hover:text-gray-900">
+                        <a href="{{ route('admin.technicians.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
                             <i class="fas fa-arrow-left text-xl"></i>
                         </a>
                         <div>
-                            <h1 class="text-3xl font-bold text-gray-900">{{ $technician->name }}</h1>
-                            <p class="text-gray-600 mt-1">Technician Details</p>
+                            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $technician->name }}</h1>
+                            <p class="text-gray-600 dark:text-gray-400 mt-1">Technician Details</p>
                         </div>
                     </div>
                     <div class="flex space-x-3">
@@ -31,42 +34,40 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Technician Info -->
                 <div class="lg:col-span-2">
-                    <div class="bg-white rounded-xl shadow-md p-6">
-                        <h3 class="text-lg font-bold text-gray-900 mb-4">Technician Information</h3>
+                    <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Technician Information</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <p class="text-sm text-gray-500">Name</p>
-                                <p class="font-medium text-gray-900">{{ $technician->name }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Name</p>
+                                <p class="font-medium text-gray-900 dark:text-white">{{ $technician->name }}</p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Phone</p>
-                                <p class="font-medium text-gray-900">{{ $technician->phone ?? '-' }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Phone</p>
+                                <p class="font-medium text-gray-900 dark:text-white">{{ $technician->phone ?? '-' }}</p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Email</p>
-                                <p class="font-medium text-gray-900">{{ $technician->email ?? '-' }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                                <p class="font-medium text-gray-900 dark:text-white">{{ $technician->email ?? '-' }}</p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Role</p>
-                                <p class="font-medium text-gray-900">{{ ucfirst($technician->role ?? 'Technician') }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Role</p>
+                                <p class="font-medium text-gray-900 dark:text-white">{{ ucfirst($technician->role ?? 'Technician') }}</p>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Status</p>
-                                <span class="px-3 py-1 text-sm rounded-full {{ $technician->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Status</p>
+                                <span class="px-3 py-1 text-sm rounded-full {{ $technician->is_active ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300' }}">
                                     {{ $technician->is_active ? 'Active' : 'Inactive' }}
                                 </span>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-500">Area Coverage</p>
-                                <p class="font-medium text-gray-900">{{ $technician->area_coverage ?? '-' }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Area Coverage</p>
+                                <p class="font-medium text-gray-900 dark:text-white">{{ $technician->area_coverage ?? '-' }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Stats Card -->
                 <div>
                     <div class="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl shadow-md p-6 text-white">
                         <h3 class="text-lg font-semibold mb-4">Statistics</h3>

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Collector;
 
 class Invoice extends Model
 {
@@ -25,6 +26,7 @@ class Invoice extends Model
         'payment_reference',
         'payment_url',
         'collected_by',
+        'collector_id',
     ];
 
     protected $casts = [
@@ -47,7 +49,7 @@ class Invoice extends Model
 
     public function collector()
     {
-        return $this->belongsTo(User::class, 'collected_by');
+        return $this->belongsTo(Collector::class, 'collector_id');
     }
 
     public function getTotalAmountAttribute()
@@ -62,6 +64,8 @@ class Invoice extends Model
 
     public function isOverdue()
     {
-        return $this->status === 'unpaid' && $this->due_date && $this->due_date->isPast();
+        return $this->status === 'unpaid'
+            && $this->due_date
+            && $this->due_date->isPast();
     }
 }

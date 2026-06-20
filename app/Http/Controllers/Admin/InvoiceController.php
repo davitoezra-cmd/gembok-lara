@@ -7,6 +7,7 @@ use App\Events\InvoicePaid;
 use App\Services\WhatsAppService;
 use App\Services\PaymentGatewayService;
 use Illuminate\Http\Request;
+use App\Models\Collector;
 
 class InvoiceController extends Controller
 {
@@ -21,7 +22,11 @@ class InvoiceController extends Controller
 
     public function index(Request $request)
     {
-        $query = \App\Models\Invoice::with(['customer', 'package']);
+        $query = \App\Models\Invoice::with([
+        'customer',
+        'package',
+        'collector'
+    ]);
 
         // Filter by status
         if ($request->filled('status')) {
@@ -57,39 +62,47 @@ class InvoiceController extends Controller
 
     public function create()
     {
-        $customers = \App\Models\Customer::where('status', 'active')->orderBy('name')->get();
-        $packages = \App\Models\Package::where('is_active', true)->get();
-        return view('admin.invoices.create', compact('customers', 'packages'));
-    }
+    $customers = \App\Models\Customer::where('status', 'active')->orderBy('name')->get();
+    $packages = \App\Models\Package::where('is_active', true)->get();
+    $collectors = Collector::where('status', 'active')->orderBy('name')->get();
+
+    return view('admin.invoices.create', compact(
+        'customers',
+        'packages',
+        'collectors'
+    ));
+}
+
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'package_id' => 'nullable|exists:packages,id',
-            'amount' => 'required|integer|min:0',
-            'tax_amount' => 'nullable|integer|min:0',
-            'description' => 'nullable|string',
-            'due_date' => 'nullable|date',
-            'invoice_type' => 'required|in:monthly,installation,voucher,other',
-        ]);
+       $validated = $request->validate([
+    'customer_id' => 'required|exists:customers,id',
+    'collector_id' => 'nullable|exists:collectors,id',
+    'package_id' => 'nullable|exists:packages,id',
+    'amount' => 'required|integer|min:0',
+    'tax_amount' => 'nullable|integer|min:0',
+    'description' => 'nullable|string',
+    'due_date' => 'nullable|date',
+    'invoice_type' => 'required|in:monthly,installation,voucher,other',
+]);
+   $validated['invoice_number'] = 'INV-' . date('Ymd') . '-' . strtoupper(\Illuminate\Support\Str::random(5));
+    $validated['status'] = 'unpaid';
 
-        // Generate invoice number
-        $lastInvoice = \App\Models\Invoice::latest()->first();
-        $number = $lastInvoice ? (int)substr($lastInvoice->invoice_number, 4) + 1 : 1;
-        $validated['invoice_number'] = 'INV-' . str_pad($number, 6, '0', STR_PAD_LEFT);
-        $validated['status'] = 'unpaid';
-        $validated['tax_amount'] = $validated['tax_amount'] ?? 0;
-
-        \App\Models\Invoice::create($validated);
-
-        return redirect()->route('admin.invoices.index')
-            ->with('success', 'Invoice created successfully!');
+    // 3. INI YANG PALING PENTING: Simpan data ke database
+    \App\Models\Invoice::create($validated);
+        
+	return redirect()->route('admin.invoices.index')
+        ->with('success', 'Invoice created successfully!');
     }
 
     public function show(\App\Models\Invoice $invoice)
     {
-        $invoice->load(['customer', 'package']);
+        $invoice->load([
+        'customer',
+        'package',
+        'collector'
+]);
         return view('admin.invoices.show', compact('invoice'));
     }
 
@@ -242,7 +255,11 @@ class InvoiceController extends Controller
 
     public function print(\App\Models\Invoice $invoice)
     {
-        $invoice->load(['customer', 'package']);
+        $invoice->load([
+        'customer',
+        'package',
+        'collector'
+    ]);
         $company = [
             'name' => \App\Models\AppSetting::where('key', 'company_name')->value('value') ?? 'GEMBOK LARA',
             'phone' => \App\Models\AppSetting::where('key', 'company_phone')->value('value') ?? '-',

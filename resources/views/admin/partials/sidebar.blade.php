@@ -99,6 +99,21 @@
             <i class="fas fa-map-marked-alt w-5 mr-3"></i>
             <span>Network Map</span>
         </a>
+
+        <a href="{{ route('admin.network.tiangs.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.network.tiangs.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-heading w-5 mr-3"></i>
+            <span>Tiang Management</span>
+        </a>
+
+        <a href="{{ route('admin.network.modems.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.network.modems.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-hdd w-5 mr-3"></i>
+            <span>Modem Management</span>
+        </a>
+
+        <a href="{{ route('admin.network.backbones.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.network.backbones.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-route w-5 mr-3"></i>
+            <span>Backbone Management</span>
+        </a>
         
         <div class="border-t border-cyan-500/20 my-3"></div>
         <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2">Services</p>
@@ -170,7 +185,7 @@
 
         <div x-data="{ openTickets: {{ request()->routeIs('admin.ticket_gangguan.*') || request()->routeIs('admin.tickets.*') ? 'true' : 'false' }} }">
             <button @click="openTickets = !openTickets" 
-                class="flex items-center w-full px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.ticket_gangguan.*') || request()->routeIs('admin.tickets.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+                class="flex items-center w-full px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.ticket_gangguan.*') || request()->routeIs('admin.tickets.*') ? 'true font-semibold' : '' }}">
                 <i class="fas fa-headset w-5 mr-3 flex-shrink-0"></i>
                 <span class="truncate text-left flex-1 text-sm">Ticket Management</span>
                 <i class="fas fa-chevron-down text-xs transition-transform duration-200 ml-2 flex-shrink-0" :class="openTickets ? 'rotate-180' : ''"></i>

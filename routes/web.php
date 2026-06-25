@@ -14,9 +14,20 @@ use App\Http\Controllers\Admin\OdpController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\TiketGangguanController;
+use App\Http\Controllers\AttendanceController;
 
 
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+    Route::post('/attendance/store', [AttendanceController::class, 'store'])->name('attendance.store');
+});
+
+
+
+// ============================================================
 // Public Routes
+// ============ ================================================
 Route::get('/', function () {
     $packages = \App\Models\Package::where('is_active', true)->orderBy('price')->get();
     return view('welcome', compact('packages'));
@@ -38,27 +49,30 @@ Route::get('/login', function () {
     return redirect('/admin/login');
 })->name('login');
 
+
+// ============================================================
 // Admin Routes
+// ============================================================
 Route::prefix('admin')->name('admin.')->group(function () {
     // Auth Routes
     Route::get('/login', function () {
         return view('admin.login');
     })->name('login');
-    
+
     Route::post('/login', [DashboardController::class, 'login'])->name('login.post');
     Route::post('/logout', [DashboardController::class, 'logout'])->name('logout');
-    
+
     // Protected Admin Routes
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-        
+
         // Customer Management
         Route::resource('customers', CustomerController::class);
         Route::get('/customers/{customer}/invoices', [CustomerController::class, 'invoices'])->name('customers.invoices');
-        
+
         // Package Management
         Route::resource('packages', PackageController::class);
-        
+
         // Invoice Management
         Route::resource('invoices', InvoiceController::class);
         Route::post('/invoices/{invoice}/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
@@ -66,19 +80,25 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/invoices/{invoice}/send-notification', [InvoiceController::class, 'sendNotification'])->name('invoices.send-notification');
         Route::post('/invoices/{invoice}/create-payment-link', [InvoiceController::class, 'createPaymentLink'])->name('invoices.create-payment-link');
         Route::post('/invoices/{invoice}/send-payment-link', [InvoiceController::class, 'sendPaymentLink'])->name('invoices.send-payment-link');
-        
+
         // Technician Management
         Route::resource('technicians', TechnicianController::class);
-        
+
+        // Gaji Management
+        Route::resource('overtimes', \App\Http\Controllers\Admin\OvertimeController::class);
+        Route::get('payrolls', [\App\Http\Controllers\Admin\PayrollController::class, 'index'])->name('payrolls.index');
+        Route::post('payrolls/generate', [\App\Http\Controllers\Admin\PayrollController::class, 'generate'])->name('payrolls.generate');
+        Route::post('payrolls/{payroll}/pay', [\App\Http\Controllers\Admin\PayrollController::class, 'pay'])->name('payrolls.pay');
+
         // Collector Management
         Route::resource('collectors', CollectorController::class);
         Route::get('/collectors/{collector}/payments', [CollectorController::class, 'payments'])->name('collectors.payments');
-        
+
         // Agent Management
         Route::resource('agents', AgentController::class);
         Route::get('/agents/{agent}/balance', [AgentController::class, 'balance'])->name('agents.balance');
         Route::post('/agents/{agent}/topup', [AgentController::class, 'topup'])->name('agents.topup');
-        
+
         // Voucher Management
         Route::prefix('vouchers')->name('vouchers.')->group(function () {
             Route::get('/', [VoucherController::class, 'index'])->name('index');
@@ -91,7 +111,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/purchases', [VoucherController::class, 'purchases'])->name('purchases');
             Route::get('/generate', [VoucherController::class, 'generate'])->name('generate');
             Route::post('/generate', [VoucherController::class, 'storeGenerate'])->name('generate.store');
-            
+
             // Hotspot Voucher Management
             Route::get('/hotspot', [VoucherController::class, 'hotspot'])->name('hotspot');
             Route::get('/hotspot/profiles', [VoucherController::class, 'hotspotProfiles'])->name('hotspot.profiles');
@@ -105,14 +125,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/hotspot/sync', [VoucherController::class, 'hotspotSync'])->name('hotspot.sync');
             Route::post('/hotspot/sync', [VoucherController::class, 'doHotspotSync'])->name('hotspot.sync.do');
         });
-        
+
         // ODP & Cable Network Management
         Route::prefix('network')->name('network.')->group(function () {
             Route::resource('odps', OdpController::class);
             Route::get('/odps/{odp}/cables', [OdpController::class, 'cables'])->name('odps.cables');
             Route::get('/map', [OdpController::class, 'map'])->name('map');
+            Route::resource('backbones', \App\Http\Controllers\Admin\BackbonesController::class);
+            Route::resource('tiangs', \App\Http\Controllers\Admin\TiangController::class);
+            Route::resource('modems', \App\Http\Controllers\Admin\ModemController::class);
         });
-        
+
         // Tickets
         Route::prefix('tickets')->name('tickets.')->group(function () {
             Route::get('/', [TicketController::class, 'index'])->name('index');
@@ -125,11 +148,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::delete('/{ticket}', [TicketController::class, 'destroy'])->name('destroy');
         });
 
-        Route::get('ticket_gangguan', 'App\Http\Controllers\Admin\TiketGangguanController@index')->name('ticket_gangguan.index');
-        Route::get('ticket_gangguan/create', 'App\Http\Controllers\Admin\TiketGangguanController@create')->name('ticket_gangguan.create');
-        Route::post('ticket_gangguan', 'App\Http\Controllers\Admin\TiketGangguanController@store')->name('ticket_gangguan.store');
-        Route::get('ticket_gangguan/{id}', 'App\Http\Controllers\Admin\TiketGangguanController@show')->name('ticket_gangguan.show');
-        Route::delete('ticket_gangguan/{id}', 'App\Http\Controllers\Admin\TiketGangguanController@destroy')->name('ticket_gangguan.destroy');
+        // Tiket Gangguan
+        Route::get('ticket_gangguan', [TiketGangguanController::class, 'index'])->name('ticket_gangguan.index');
+        Route::get('ticket_gangguan/create', [TiketGangguanController::class, 'create'])->name('ticket_gangguan.create');
+        Route::post('ticket_gangguan', [TiketGangguanController::class, 'store'])->name('ticket_gangguan.store');
+        Route::get('ticket_gangguan/{id}', [TiketGangguanController::class, 'show'])->name('ticket_gangguan.show');
+        Route::delete('ticket_gangguan/{id}', [TiketGangguanController::class, 'destroy'])->name('ticket_gangguan.destroy');
 
         // Expenses
         Route::prefix('expenses')->name('expenses.')->group(function () {
@@ -145,16 +169,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Settings
         Route::get('/settings', [SettingController::class, 'index'])->name('settings');
         Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
-        
+
         // API Documentation
         Route::get('/api-docs', function () {
             return view('admin.api-docs');
         })->name('api-docs');
-        
+
         // Change Password
         Route::get('/change-password', [DashboardController::class, 'changePassword'])->name('change-password');
         Route::post('/change-password', [DashboardController::class, 'updatePassword'])->name('change-password.update');
-        
+
         // Mikrotik Management
         Route::prefix('mikrotik')->name('mikrotik.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\MikrotikController::class, 'index'])->name('index');
@@ -164,7 +188,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/system-resource', [\App\Http\Controllers\Admin\MikrotikController::class, 'systemResource'])->name('system.resource');
             Route::get('/traffic-stats', [\App\Http\Controllers\Admin\MikrotikController::class, 'trafficStats'])->name('traffic.stats');
             Route::get('/test-connection', [\App\Http\Controllers\Admin\MikrotikController::class, 'testConnection'])->name('test');
-            
+
             // Sync Routes
             Route::prefix('sync')->name('sync.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Admin\MikrotikSyncController::class, 'index'])->name('index');
@@ -176,7 +200,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 Route::post('/hotspot', [\App\Http\Controllers\Admin\MikrotikSyncController::class, 'importHotspot'])->name('hotspot.import');
             });
         });
-        
+
         // OLT Management
         Route::prefix('olt')->name('olt.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\OltController::class, 'index'])->name('index');
@@ -188,7 +212,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::delete('/{olt}', [\App\Http\Controllers\Admin\OltController::class, 'destroy'])->name('destroy');
             Route::post('/{olt}/test', [\App\Http\Controllers\Admin\OltController::class, 'testConnection'])->name('test');
             Route::post('/{olt}/sync', [\App\Http\Controllers\Admin\OltController::class, 'sync'])->name('sync');
-            
+
             // ONU Routes
             Route::get('/onu/list', [\App\Http\Controllers\Admin\OltController::class, 'onuIndex'])->name('onu.index');
             Route::get('/onu/create', [\App\Http\Controllers\Admin\OltController::class, 'onuCreate'])->name('onu.create');
@@ -199,7 +223,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/onu/{onu}/reboot', [\App\Http\Controllers\Admin\OltController::class, 'onuReboot'])->name('onu.reboot');
             Route::post('/onu/{onu}/status', [\App\Http\Controllers\Admin\OltController::class, 'onuUpdateStatus'])->name('onu.status');
         });
-        
+
         // CPE Management (GenieACS)
         Route::prefix('cpe')->name('cpe.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\CpeController::class, 'index'])->name('index');
@@ -211,7 +235,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/bulk-reboot', [\App\Http\Controllers\Admin\CpeController::class, 'bulkReboot'])->name('bulk.reboot');
             Route::post('/bulk-refresh', [\App\Http\Controllers\Admin\CpeController::class, 'bulkRefresh'])->name('bulk.refresh');
         });
-        
+
         // WhatsApp Gateway
         Route::prefix('whatsapp')->name('whatsapp.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\WhatsAppController::class, 'index'])->name('index');
@@ -226,7 +250,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/bulk-invoice', [\App\Http\Controllers\Admin\WhatsAppController::class, 'bulkSendInvoice'])->name('bulk.invoice');
             Route::post('/bulk-reminder', [\App\Http\Controllers\Admin\WhatsAppController::class, 'bulkSendReminder'])->name('bulk.reminder');
         });
-        
+
         // Payment Gateway
         Route::prefix('payment')->name('payment.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('index');
@@ -235,7 +259,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/check-status', [\App\Http\Controllers\Admin\PaymentController::class, 'checkStatus'])->name('check-status');
             Route::post('/send-link/{invoice}', [\App\Http\Controllers\Admin\PaymentController::class, 'sendPaymentLink'])->name('send-link');
         });
-        
+
         // Reports
         Route::prefix('reports')->name('reports.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('index');
@@ -243,7 +267,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/monthly', [\App\Http\Controllers\Admin\ReportController::class, 'monthly'])->name('monthly');
             Route::get('/export', [\App\Http\Controllers\Admin\ReportController::class, 'export'])->name('export');
         });
-        
+
         // RADIUS Management
         Route::prefix('radius')->name('radius.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\RadiusController::class, 'index'])->name('index');
@@ -257,7 +281,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/unsuspend', [\App\Http\Controllers\Admin\RadiusController::class, 'unsuspend'])->name('unsuspend');
             Route::get('/history/{username}', [\App\Http\Controllers\Admin\RadiusController::class, 'history'])->name('history');
         });
-        
+
         // SNMP Network Monitoring
         Route::prefix('snmp')->name('snmp.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\SnmpController::class, 'index'])->name('index');
@@ -268,7 +292,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/devices', [\App\Http\Controllers\Admin\SnmpController::class, 'storeDevice'])->name('devices.store');
             Route::delete('/devices/{id}', [\App\Http\Controllers\Admin\SnmpController::class, 'deleteDevice'])->name('devices.delete');
         });
-        
+
         // IP Monitor
         Route::prefix('ip-monitor')->name('ip-monitor.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\IpMonitorController::class, 'index'])->name('index');
@@ -287,7 +311,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/{ipMonitor}/ping', [\App\Http\Controllers\Admin\IpMonitorController::class, 'ping'])->name('ping');
             Route::post('/{ipMonitor}/toggle', [\App\Http\Controllers\Admin\IpMonitorController::class, 'toggleActive'])->name('toggle');
         });
-        
+
         // CRM & Accounting Integration
         Route::prefix('integration')->name('integration.')->group(function () {
             Route::get('/crm', [\App\Http\Controllers\Admin\IntegrationController::class, 'crm'])->name('crm');
@@ -301,7 +325,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/accounting/bulk-sync', [\App\Http\Controllers\Admin\IntegrationController::class, 'bulkSyncAccounting'])->name('accounting.bulk-sync');
             Route::post('/accounting/test', [\App\Http\Controllers\Admin\IntegrationController::class, 'testAccountingConnection'])->name('accounting.test');
         });
-        
+
         // Orders Management
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('index');
@@ -310,87 +334,86 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/{order}/confirm-payment', [\App\Http\Controllers\Admin\OrderController::class, 'confirmPayment'])->name('confirm-payment');
             Route::post('/{order}/complete', [\App\Http\Controllers\Admin\OrderController::class, 'complete'])->name('complete');
         });
-        
+
         // Integration Settings (GUI)
         Route::prefix('settings')->name('settings.')->group(function () {
             Route::get('/integrations', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'index'])->name('integrations');
-            
+
             // Mikrotik
             Route::get('/mikrotik', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'mikrotik'])->name('mikrotik');
             Route::post('/mikrotik', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveMikrotik'])->name('mikrotik.save');
             Route::post('/mikrotik/test', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'testMikrotik'])->name('mikrotik.test');
-            
+
             // RADIUS
             Route::get('/radius', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'radius'])->name('radius');
             Route::post('/radius', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveRadius'])->name('radius.save');
             Route::post('/radius/test', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'testRadius'])->name('radius.test');
-            
+
             // GenieACS
             Route::get('/genieacs', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'genieacs'])->name('genieacs');
             Route::post('/genieacs', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveGenieacs'])->name('genieacs.save');
             Route::post('/genieacs/test', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'testGenieacs'])->name('genieacs.test');
-            
+
             // WhatsApp
             Route::get('/whatssapp', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveWhatsapp'])->name('whatsapp.save');
             Route::post('/whatapp', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'whatsapp'])->name('whatsapp');
             Route::post('/whatsapp/test', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'testWhatsapp'])->name('whatsapp.test');
-            
+
             // Midtrans
             Route::get('/midtrans', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'midtrans'])->name('midtrans');
             Route::post('/midtrans', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveMidtrans'])->name('midtrans.save');
-            
+
             // Xendit
             Route::get('/xendit', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'xendit'])->name('xendit');
             Route::post('/xendit', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveXendit'])->name('xendit.save');
-            
+
             // Duitku
             Route::get('/duitku', [\App\Http\Controllers\Admin\DuitkuController::class, 'settings'])->name('duitku');
             Route::post('/duitku', [\App\Http\Controllers\Admin\DuitkuController::class, 'saveSettings'])->name('duitku.save');
             Route::post('/duitku/test', [\App\Http\Controllers\Admin\DuitkuController::class, 'testConnection'])->name('duitku.test');
         });
-        
+
         // Duitku Payment
         Route::post('/duitku/create-payment/{invoice}', [\App\Http\Controllers\Admin\DuitkuController::class, 'createPayment'])->name('duitku.create-payment');
         Route::post('/duitku/send-link/{invoice}', [\App\Http\Controllers\Admin\DuitkuController::class, 'sendPaymentLink'])->name('duitku.send-link');
         Route::get('/duitku/check-status', [\App\Http\Controllers\Admin\DuitkuController::class, 'checkStatus'])->name('duitku.check-status');
-        
+
         // Hotspot Management (2-Way Sync)
         Route::prefix('hotspot')->name('hotspot.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\HotspotController::class, 'index'])->name('index');
-            
-            // Profiles
+
             Route::get('/profiles', [\App\Http\Controllers\Admin\HotspotController::class, 'profiles'])->name('profiles');
             Route::get('/profiles/create', [\App\Http\Controllers\Admin\HotspotController::class, 'createProfile'])->name('profiles.create');
             Route::post('/profiles', [\App\Http\Controllers\Admin\HotspotController::class, 'storeProfile'])->name('profiles.store');
             Route::get('/profiles/{profile}/edit', [\App\Http\Controllers\Admin\HotspotController::class, 'editProfile'])->name('profiles.edit');
             Route::put('/profiles/{profile}', [\App\Http\Controllers\Admin\HotspotController::class, 'updateProfile'])->name('profiles.update');
             Route::delete('/profiles/{profile}', [\App\Http\Controllers\Admin\HotspotController::class, 'deleteProfile'])->name('profiles.delete');
-            
-            // Vouchers
+
             Route::get('/vouchers', [\App\Http\Controllers\Admin\HotspotController::class, 'vouchers'])->name('vouchers');
             Route::get('/vouchers/generate', [\App\Http\Controllers\Admin\HotspotController::class, 'generateVouchers'])->name('vouchers.generate');
             Route::post('/vouchers/generate', [\App\Http\Controllers\Admin\HotspotController::class, 'storeVouchers'])->name('vouchers.store');
             Route::delete('/vouchers/{voucher}', [\App\Http\Controllers\Admin\HotspotController::class, 'deleteVoucher'])->name('vouchers.delete');
             Route::post('/vouchers/bulk-delete', [\App\Http\Controllers\Admin\HotspotController::class, 'bulkDeleteVouchers'])->name('vouchers.bulk-delete');
             Route::post('/vouchers/print', [\App\Http\Controllers\Admin\HotspotController::class, 'printVouchers'])->name('vouchers.print');
-            
-            // Sync
+
             Route::get('/sync', [\App\Http\Controllers\Admin\HotspotController::class, 'sync'])->name('sync');
             Route::post('/sync', [\App\Http\Controllers\Admin\HotspotController::class, 'doSync'])->name('sync.do');
-            
-            // Logs
+
             Route::get('/logs', [\App\Http\Controllers\Admin\HotspotController::class, 'logs'])->name('logs');
         });
     });
 });
 
+
+// ============================================================
 // Agent Routes
+// ============================================================
 Route::prefix('agent')->name('agent.')->group(function () {
     Route::get('/login', function () {
         return view('agent.login');
     })->name('login');
     Route::post('/login', [\App\Http\Controllers\Portal\AgentController::class, 'login'])->name('login.post');
-    
+
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Portal\AgentController::class, 'dashboard'])->name('dashboard');
         Route::post('/logout', [\App\Http\Controllers\Portal\AgentController::class, 'logout'])->name('logout');
@@ -404,13 +427,16 @@ Route::prefix('agent')->name('agent.')->group(function () {
     });
 });
 
+
+// ============================================================
 // Collector Routes
+// ============================================================
 Route::prefix('collector')->name('collector.')->group(function () {
     Route::get('/login', function () {
         return view('collector.login');
     })->name('login');
     Route::post('/login', [\App\Http\Controllers\Portal\CollectorController::class, 'login'])->name('login.post');
-    
+
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Portal\CollectorController::class, 'dashboard'])->name('dashboard');
         Route::post('/logout', [\App\Http\Controllers\Portal\CollectorController::class, 'logout'])->name('logout');
@@ -422,13 +448,16 @@ Route::prefix('collector')->name('collector.')->group(function () {
     });
 });
 
+
+// ============================================================
 // Technician Routes
+// ============================================================
 Route::prefix('technician')->name('technician.')->group(function () {
     Route::get('/login', function () {
         return view('technician.login');
     })->name('login');
     Route::post('/login', [\App\Http\Controllers\Portal\TechnicianController::class, 'login'])->name('login.post');
-    
+
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Portal\TechnicianController::class, 'dashboard'])->name('dashboard');
         Route::post('/logout', [\App\Http\Controllers\Portal\TechnicianController::class, 'logout'])->name('logout');
@@ -442,14 +471,16 @@ Route::prefix('technician')->name('technician.')->group(function () {
     });
 });
 
-// Customer Portal Routes
+
+// ============================================================
+// Customer Portal Routes — TIDAK ADA akses /attendance
+// ============================================================
 Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/login', function () {
         return view('customer.login');
     })->name('login');
     Route::post('/login', [\App\Http\Controllers\Portal\CustomerController::class, 'login'])->name('login.post');
-    
-    // No auth middleware - customer uses session-based auth handled in controller
+
     Route::get('/dashboard', [\App\Http\Controllers\Portal\CustomerController::class, 'dashboard'])->name('dashboard');
     Route::post('/logout', [\App\Http\Controllers\Portal\CustomerController::class, 'logout'])->name('logout');
     Route::get('/logout', [\App\Http\Controllers\Portal\CustomerController::class, 'logout'])->name('logout.get');
@@ -466,7 +497,10 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/usage', [\App\Http\Controllers\Portal\CustomerController::class, 'usage'])->name('usage');
 });
 
+
+// ============================================================
 // Public Voucher Purchase
+// ============================================================
 Route::prefix('voucher')->name('voucher.')->group(function () {
     Route::get('/buy', function () {
         $packages = \App\Models\VoucherPricing::where('is_active', true)->orderBy('duration')->get();

@@ -12,8 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Middleware bawaan web kamu tetap aman di sini
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
+        ]);
+
+        // 🟩 TAMBAHKAN ALIAS BARU DI SINI
+        $middleware->alias([
+            'role.not.customer' => \App\Http\Middleware\RoleNotCustomer::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

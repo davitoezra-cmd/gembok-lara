@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Technician;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class TechnicianSeeder extends Seeder
 {
@@ -14,6 +15,7 @@ class TechnicianSeeder extends Seeder
                 'name' => 'Budi Santoso',
                 'phone' => '081234567890',
                 'email' => 'budi.tech@gembok.com',
+                'password' => Hash::make('password123'),
                 'role' => 'supervisor',
                 'area_coverage' => 'Jakarta Utara',
                 'is_active' => true,

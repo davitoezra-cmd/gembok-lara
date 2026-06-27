@@ -464,10 +464,7 @@ Route::prefix('technician')->name('technician.')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Portal\TechnicianController::class, 'dashboard'])->name('dashboard');
         Route::post('/logout', [\App\Http\Controllers\Portal\TechnicianController::class, 'logout'])->name('logout');
 
-        // Attendance Technician
-        Route::get('/attendance', [TechnicianAttendanceController::class, 'index'])->name('attendance.index');
-        Route::post('/attendance/store', [TechnicianAttendanceController::class, 'store'])->name('attendance.store');
-        Route::post('/attendance/checkout/{id}', [TechnicianAttendanceController::class, 'checkout'])->name('attendance.checkout');
+        
 
         Route::get('/tasks', [\App\Http\Controllers\Portal\TechnicianController::class, 'tasks'])->name('tasks');
         Route::get('/tasks/{task}', [\App\Http\Controllers\Portal\TechnicianController::class, 'showTask'])->name('tasks.show');
